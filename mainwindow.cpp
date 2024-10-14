@@ -611,10 +611,10 @@ void MainWindow::on_Bresenham_Ellipse_Button_clicked()
     ui->Bresenham_Ellipse_Time->setText(QString::number(elapsed) + " ms");
 }
 
-class MainWindow::Edge{
+class MainWindow::Edge {
 public:
     QPoint p1, p2;               // Endpoints of the edge
-    QMap<int, int> yToXMap;       // Map storing x-coordinate for a given y-coordinate
+    QMap<int, QVector<int>> yToXMap;  // Map storing x-coordinates for a given y-coordinate
 
     // Constructor that takes two points and a QSet of points to build the map
     Edge(const QPoint& point1, const QPoint& point2, const QSet<QPoint>& edgePoints)
@@ -622,17 +622,33 @@ public:
     {
         // Populate the map with x-coordinates for each unique y-coordinate in the edge points
         for (const QPoint& point : edgePoints) {
-            yToXMap[point.y()] = point.x();
+            yToXMap[point.y()].append(point.x());  // Store x values in a vector
         }
     }
 
-    // Function to retrieve the x-coordinate for a given y-coordinate
-    // Returns -1 if no corresponding x is found
-    int getXForY(int y) const {
+    // Function to retrieve the x-coordinates for a given y-coordinate
+    // Returns an empty vector if no corresponding x is found
+    QVector<int> getXForY(int y) const {
         if (yToXMap.contains(y)) {
             return yToXMap[y];
         }
-        return -1;  // No x-coordinate for this y
+        return {};  // No x-coordinate for this y
+    }
+
+    // Function to check if the given point is a corner/endpoint of the edge
+    bool hasCorner(const QPoint& point) const {
+        return (point == p1 || point == p2);
+    }
+
+    // Function to get the other corner (endpoint) of the edge if the input point is a corner
+    // Returns the other endpoint if the point is a corner, else returns a default QPoint
+    QPoint otherCorner(const QPoint& point) const {
+        if (point == p1) {
+            return p2;
+        } else if (point == p2) {
+            return p1;
+        }
+        return QPoint();  // Return default (NULL) if not a corner
     }
 };
 
@@ -717,7 +733,7 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
     timer.start();
 
     int n = ui->Polygon_Side_Count->value();
-    int gridOffset=fmax(ui->gridOffset->value(), 1);
+    //int gridOffset=fmax(ui->gridOffset->value(), 1);
     // Get the set of points that make the polygon
     QVector<Edge> edges=make_polygon(n);
 
@@ -727,6 +743,7 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
         ui->Polygon_Label->setText("Not enough points");
         return;
     }
+    QSet<QPoint> current=allPolygonPoints;
     int r=ui->Polygon_Scanline_R->value();
     int g=ui->Polygon_Scanline_G->value();
     int b=ui->Polygon_Scanline_B->value();
@@ -735,7 +752,6 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
         maxY=fmax(maxY, e.yToXMap.lastKey());
         minY=fmin(minY, e.yToXMap.firstKey());
     }
-
 }
 
 void MainWindow::on_Flood_Fill_clicked()
