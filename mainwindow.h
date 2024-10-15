@@ -16,7 +16,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    class Edge;
+    class Vertex;
 protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 private slots:
@@ -60,7 +60,7 @@ private:
     QVector<QPoint> clickedPoints; // To store clicked points
     void drawCirclePoints(int x, int y, int pixelCenterX, int pixelCenterY, int r, int g, int b, int gridOffset);
     void drawEllipsePoints(int x, int y, int pixelCenterX, int pixelCenterY, int r, int g, int b, int gridOffset);
-    QVector<Edge> make_polygon(int n);
+    QHash<QPoint, QVector<QPoint>> make_polygon(int n);
     QSet<QPoint> allPolygonPoints;
     QColor getPixelColor(int x, int y);
     QColor lastColor;

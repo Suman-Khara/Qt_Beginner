@@ -610,56 +610,14 @@ void MainWindow::on_Bresenham_Ellipse_Button_clicked()
     qint64 elapsed = timer.elapsed();
     ui->Bresenham_Ellipse_Time->setText(QString::number(elapsed) + " ms");
 }
-
-class MainWindow::Edge {
-public:
-    QPoint p1, p2;               // Endpoints of the edge
-    QMap<int, QVector<int>> yToXMap;  // Map storing x-coordinates for a given y-coordinate
-
-    // Constructor that takes two points and a QSet of points to build the map
-    Edge(const QPoint& point1, const QPoint& point2, const QSet<QPoint>& edgePoints)
-        : p1(point1), p2(point2)
-    {
-        // Populate the map with x-coordinates for each unique y-coordinate in the edge points
-        for (const QPoint& point : edgePoints) {
-            yToXMap[point.y()].append(point.x());  // Store x values in a vector
-        }
-    }
-
-    // Function to retrieve the x-coordinates for a given y-coordinate
-    // Returns an empty vector if no corresponding x is found
-    QVector<int> getXForY(int y) const {
-        if (yToXMap.contains(y)) {
-            return yToXMap[y];
-        }
-        return {};  // No x-coordinate for this y
-    }
-
-    // Function to check if the given point is a corner/endpoint of the edge
-    bool hasCorner(const QPoint& point) const {
-        return (point == p1 || point == p2);
-    }
-
-    // Function to get the other corner (endpoint) of the edge if the input point is a corner
-    // Returns the other endpoint if the point is a corner, else returns a default QPoint
-    QPoint otherCorner(const QPoint& point) const {
-        if (point == p1) {
-            return p2;
-        } else if (point == p2) {
-            return p1;
-        }
-        return QPoint();  // Return default (NULL) if not a corner
-    }
-};
-
-using Edge=MainWindow::Edge;
-
-QVector<Edge> MainWindow::make_polygon(int n)
+QHash<QPoint, QVector<QPoint>> belongsToEdge;
+QHash<QPoint, QVector<QPoint>> MainWindow::make_polygon(int n)
 {
     allPolygonPoints.clear();
+    belongsToEdge.clear();
     QSet<QPoint> distinctPoints;
     QList<QPoint> orderedPoints;
-    QVector<Edge> edges;  // Vector to store the edges of the polygon
+    QHash<QPoint, QVector<QPoint>> connections;  // Use QHash instead of QMap
 
     // Gather last 'n' distinct points from clickedPoints
     for (auto it = clickedPoints.rbegin(); it != clickedPoints.rend() && distinctPoints.size() < n; ++it)
@@ -671,26 +629,41 @@ QVector<Edge> MainWindow::make_polygon(int n)
         }
     }
 
-    // If there are not enough distinct points, return an empty set
+    // If there are not enough distinct points, return an empty hash
     if (distinctPoints.size() < n)
     {
-        return QVector<Edge>();  // Return empty vector
+        return QHash<QPoint, QVector<QPoint>>();  // Return empty hash
     }
 
-    // Iterate through the points to create the polygon lines and store edges
+    // Iterate through the points to create the polygon lines and track connections
     for (int i = 0; i < orderedPoints.size(); ++i)
     {
         QPoint p1 = orderedPoints[i];
         QPoint p2 = orderedPoints[(i + 1) % orderedPoints.size()]; // Connect last point to the first one
         QSet<QPoint> linePoints = make_Bresenham_Line(p1.x(), p1.y(), p2.x(), p2.y());
         allPolygonPoints.unite(linePoints); // Add the line points to the overall polygon points
+        for(QPoint p:linePoints){
+            if(p!=p1 && p!=p2){
+                if(!belongsToEdge.contains(p))
+                    belongsToEdge[p]=QVector<QPoint>();
+                belongsToEdge[p].append(p1);
+                belongsToEdge[p].append(p2);
+            }
+        }
+        // Add the connection p1 -> p2 and p2 -> p1 to the hash
+        if (!connections.contains(p1)) {
+            connections[p1] = QVector<QPoint>();
+        }
+        connections[p1].append(p2);
 
-        // Create the Edge and add it to the vector
-        Edge edge(p1, p2, linePoints);
-        edges.append(edge);
+        if (!connections.contains(p2)) {
+            connections[p2] = QVector<QPoint>();
+        }
+        connections[p2].append(p1);
     }
 
-    return edges;  // Return the vector of edges
+    // Return the hash of connections
+    return connections;
 }
 
 void MainWindow::on_Polygon_Button_clicked()
@@ -723,8 +696,6 @@ void MainWindow::on_Polygon_Button_clicked()
     // Display the elapsed time in ms
     qint64 elapsed = timer.elapsed();
     ui->Polygon_Label->setText(QString::number(elapsed) + " ms");
-    for(QPoint p:allPolygonPoints)
-        lekh p;
 }
 
 void MainWindow::on_Polygon_Scanline_Fill_clicked()
@@ -735,7 +706,7 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
     int n = ui->Polygon_Side_Count->value();
     //int gridOffset=fmax(ui->gridOffset->value(), 1);
     // Get the set of points that make the polygon
-    QVector<Edge> edges=make_polygon(n);
+    QHash<QPoint, QVector<QPoint>> connections=make_polygon(n);
 
     // If the set is empty, it means we don't have enough points
     if (allPolygonPoints.isEmpty())
@@ -743,15 +714,109 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
         ui->Polygon_Label->setText("Not enough points");
         return;
     }
-    QSet<QPoint> current=allPolygonPoints;
     int r=ui->Polygon_Scanline_R->value();
     int g=ui->Polygon_Scanline_G->value();
     int b=ui->Polygon_Scanline_B->value();
     int maxY=INT_MIN, minY=INT_MAX;
-    for(Edge e:edges){
-        maxY=fmax(maxY, e.yToXMap.lastKey());
-        minY=fmin(minY, e.yToXMap.firstKey());
+    for(QPoint p:allPolygonPoints){
+        maxY=fmax(maxY, p.y());
+        minY=fmin(minY, p.y());
     }
+    for(int y=minY;y<=maxY;y++){
+        int minX=INT_MAX, maxX=INT_MIN;
+        for(QPoint p:allPolygonPoints){
+            if(y!=p.y())
+                continue;
+            minX=fmin(minX, p.x());
+            maxX=fmax(maxX, p.x());
+        }
+        bool colorable=false;
+        int down=-1, up=-1, final=-1;
+        QPoint edge1=QPoint(INT_MIN, INT_MIN), edge2=QPoint(INT_MIN, INT_MIN);
+        for(int x=minX;x<=maxX;x++){
+            QPoint p(x, y);
+            if(allPolygonPoints.contains(p)){ //(x, y) is an edge point
+                if(final==-1)
+                    final=0;
+                if(connections.contains(p)){ //(x,y) is a vertex
+                    //check if this is a new edge or not
+
+                    if(edge1!=p && edge2!=p){
+                        colorable=!colorable;
+                        edge1=p, edge2=p;
+                    }
+                    QPoint p1=connections[p][0], p2=connections[p][1];
+                    if((p1.y()<y && p2.y()<y) || (p1.y()>y && p2.y()>y)){ //same side. untoggle the toggled boolean and finalise it
+                        colorable=!colorable;
+                        final=1;
+                    }
+                    else if(p1.y()!=y && p2.y()!=y) //different side. finalise the toggled boolean.
+                        final=1;
+                    else{ //one connected vertex is at the same level with current vertex. cannot be determined simply.
+                        if(p1.y()>y || p2.y()>y){
+                            if(up==-1)
+                                up=1;
+                        }
+                        else if(p1.y()<y || p2.y()<y){
+                            if(down==-1)
+                                down=1;
+                        }
+                        //skip to the next vertex, if any on the right side
+                        int new_x;
+                        if(p1.y()==y)
+                            new_x=fmax(x, p1.x());
+                        if(p2.y()==y)
+                            new_x=fmax(x, p2.x());
+                        if(new_x==x){ //we are at the rightmost point of the horizontal edge
+                            if(up==1 && down==1) //different side
+                                colorable=!colorable; //toggle (DOUBLE MISTAKE LEADING TO CORRECT BEHAVIOR XD)
+                            final=1;
+                        }
+                        else
+                            final=0; //we are not in a position to determine yet
+                        //go to the next x coordinate
+                        if(x!=new_x)
+                            x=new_x-1;
+                    }
+                }
+                else{
+                    if(belongsToEdge[p].size()==4) //OSTRICH METHOD LMFAOOOO
+                        continue;
+                    QPoint e1=belongsToEdge[p][0], e2=belongsToEdge[p][1];
+                    if(edge1==edge2){ //previous edge point was a new edge and a vertex
+                        if(edge1==e1) //vertex was e1
+                            edge2=e2;
+                        else if(edge1==e2) //vertex was e2
+                            edge2=e1;
+                        else{ //neither are vertex. hence new edge
+                            colorable=!colorable;
+                            final=0;
+                            edge1=e1, edge2=e2;
+                        }
+                    }
+                    else if((e1==edge1 && e2==edge2) || (e2==edge1 && e1==edge2)) // same as previous edge
+                        continue;
+                    else{
+                        colorable=!colorable; //toggle boolean if new edge is found
+                        final=0;
+                    }
+                    edge1=e1, edge2=e2;
+                }
+            }
+            else{ //(x, y) is an interior/exterior point
+                final=-1;
+                up=-1;
+                down=-1;
+                if(colorable){
+                    colorPointRelative(x, y, r, g, b);
+                    Delay;
+                }
+            }
+        }
+    }
+
+    qint64 elapsed = timer.elapsed();
+    ui->Flood_Fill_Time->setText(QString::number(elapsed) + " ms");
 }
 
 void MainWindow::on_Flood_Fill_clicked()
