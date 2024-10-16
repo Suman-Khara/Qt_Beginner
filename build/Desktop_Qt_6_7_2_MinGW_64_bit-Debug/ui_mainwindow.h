@@ -11,6 +11,7 @@
 
 #include <QtCore/QVariant>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QDoubleSpinBox>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QGroupBox>
 #include <QtWidgets/QHBoxLayout>
@@ -83,17 +84,49 @@ public:
     QGroupBox *groupBox_5;
     QGridLayout *gridLayout_2;
     QPushButton *Boundary_Fill;
-    QSpinBox *Seed_Color_R;
-    QLabel *label_13;
-    QLabel *label_15;
+    QSpinBox *Connected;
+    QSpinBox *Seed_Color_G;
     QLabel *label_12;
     QPushButton *Flood_Fill;
-    QSpinBox *Seed_Color_G;
-    QSpinBox *Seed_Color_B;
-    QLabel *Flood_Fill_Time;
-    QLabel *Boundary_Fill_Time;
     QLabel *label_16;
-    QSpinBox *Connected;
+    QSpinBox *Seed_Color_B;
+    QLabel *label_13;
+    QLabel *Boundary_Fill_Time;
+    QSpinBox *Seed_Color_R;
+    QLabel *Flood_Fill_Time;
+    QLabel *label_15;
+    QGroupBox *groupBox_6;
+    QGridLayout *gridLayout_4;
+    QSpinBox *Translate_Y;
+    QPushButton *Reflect_Y;
+    QLabel *label_21;
+    QPushButton *Shear_Button;
+    QPushButton *Scale_Button;
+    QLabel *label_20;
+    QPushButton *Translate_Button;
+    QLabel *label_23;
+    QSpinBox *Translate_X;
+    QPushButton *Reflect_X;
+    QLabel *label_22;
+    QSpinBox *Rotate_Degrees;
+    QDoubleSpinBox *Scale_X;
+    QDoubleSpinBox *Scale_Y;
+    QPushButton *Rotate_AC_Button;
+    QDoubleSpinBox *Shear_X;
+    QDoubleSpinBox *Shear_Y;
+    QGroupBox *groupBox_7;
+    QGridLayout *gridLayout_5;
+    QDoubleSpinBox *Scale_Y_AP;
+    QPushButton *Rotate_AC_Button_AP;
+    QDoubleSpinBox *Scale_X_AP;
+    QPushButton *Scale_Button_AP;
+    QLabel *label_24;
+    QLabel *label_25;
+    QSpinBox *Rotate_Degrees_AP;
+    QLabel *label_26;
+    QLabel *label_27;
+    QLabel *label_28;
+    QPushButton *Reflect_AL;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -270,7 +303,7 @@ public:
 
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName("groupBox_3");
-        groupBox_3->setGeometry(QRect(770, 190, 621, 80));
+        groupBox_3->setGeometry(QRect(770, 190, 621, 81));
         groupBox_3->setFont(font);
         horizontalLayout = new QHBoxLayout(groupBox_3);
         horizontalLayout->setObjectName("horizontalLayout");
@@ -379,21 +412,17 @@ public:
 
         gridLayout_2->addWidget(Boundary_Fill, 9, 0, 1, 2);
 
-        Seed_Color_R = new QSpinBox(groupBox_5);
-        Seed_Color_R->setObjectName("Seed_Color_R");
-        Seed_Color_R->setFont(font);
+        Connected = new QSpinBox(groupBox_5);
+        Connected->setObjectName("Connected");
+        Connected->setFont(font);
 
-        gridLayout_2->addWidget(Seed_Color_R, 0, 1, 1, 1);
+        gridLayout_2->addWidget(Connected, 4, 1, 1, 1);
 
-        label_13 = new QLabel(groupBox_5);
-        label_13->setObjectName("label_13");
+        Seed_Color_G = new QSpinBox(groupBox_5);
+        Seed_Color_G->setObjectName("Seed_Color_G");
+        Seed_Color_G->setFont(font);
 
-        gridLayout_2->addWidget(label_13, 2, 0, 1, 1);
-
-        label_15 = new QLabel(groupBox_5);
-        label_15->setObjectName("label_15");
-
-        gridLayout_2->addWidget(label_15, 3, 0, 1, 1);
+        gridLayout_2->addWidget(Seed_Color_G, 2, 1, 1, 1);
 
         label_12 = new QLabel(groupBox_5);
         label_12->setObjectName("label_12");
@@ -406,11 +435,10 @@ public:
 
         gridLayout_2->addWidget(Flood_Fill, 6, 0, 1, 2);
 
-        Seed_Color_G = new QSpinBox(groupBox_5);
-        Seed_Color_G->setObjectName("Seed_Color_G");
-        Seed_Color_G->setFont(font);
+        label_16 = new QLabel(groupBox_5);
+        label_16->setObjectName("label_16");
 
-        gridLayout_2->addWidget(Seed_Color_G, 2, 1, 1, 1);
+        gridLayout_2->addWidget(label_16, 4, 0, 1, 1);
 
         Seed_Color_B = new QSpinBox(groupBox_5);
         Seed_Color_B->setObjectName("Seed_Color_B");
@@ -418,12 +446,10 @@ public:
 
         gridLayout_2->addWidget(Seed_Color_B, 3, 1, 1, 1);
 
-        Flood_Fill_Time = new QLabel(groupBox_5);
-        Flood_Fill_Time->setObjectName("Flood_Fill_Time");
-        Flood_Fill_Time->setFont(font);
-        Flood_Fill_Time->setFrameShape(QFrame::Shape::Box);
+        label_13 = new QLabel(groupBox_5);
+        label_13->setObjectName("label_13");
 
-        gridLayout_2->addWidget(Flood_Fill_Time, 7, 0, 1, 2);
+        gridLayout_2->addWidget(label_13, 2, 0, 1, 1);
 
         Boundary_Fill_Time = new QLabel(groupBox_5);
         Boundary_Fill_Time->setObjectName("Boundary_Fill_Time");
@@ -432,16 +458,198 @@ public:
 
         gridLayout_2->addWidget(Boundary_Fill_Time, 10, 0, 1, 2);
 
-        label_16 = new QLabel(groupBox_5);
-        label_16->setObjectName("label_16");
+        Seed_Color_R = new QSpinBox(groupBox_5);
+        Seed_Color_R->setObjectName("Seed_Color_R");
+        Seed_Color_R->setFont(font);
 
-        gridLayout_2->addWidget(label_16, 4, 0, 1, 1);
+        gridLayout_2->addWidget(Seed_Color_R, 0, 1, 1, 1);
 
-        Connected = new QSpinBox(groupBox_5);
-        Connected->setObjectName("Connected");
-        Connected->setFont(font);
+        Flood_Fill_Time = new QLabel(groupBox_5);
+        Flood_Fill_Time->setObjectName("Flood_Fill_Time");
+        Flood_Fill_Time->setFont(font);
+        Flood_Fill_Time->setFrameShape(QFrame::Shape::Box);
 
-        gridLayout_2->addWidget(Connected, 4, 1, 1, 1);
+        gridLayout_2->addWidget(Flood_Fill_Time, 7, 0, 1, 2);
+
+        label_15 = new QLabel(groupBox_5);
+        label_15->setObjectName("label_15");
+
+        gridLayout_2->addWidget(label_15, 3, 0, 1, 1);
+
+        groupBox_6 = new QGroupBox(centralwidget);
+        groupBox_6->setObjectName("groupBox_6");
+        groupBox_6->setGeometry(QRect(770, 570, 701, 181));
+        groupBox_6->setFont(font);
+        gridLayout_4 = new QGridLayout(groupBox_6);
+        gridLayout_4->setObjectName("gridLayout_4");
+        Translate_Y = new QSpinBox(groupBox_6);
+        Translate_Y->setObjectName("Translate_Y");
+        Translate_Y->setMinimum(-99);
+
+        gridLayout_4->addWidget(Translate_Y, 1, 1, 1, 1);
+
+        Reflect_Y = new QPushButton(groupBox_6);
+        Reflect_Y->setObjectName("Reflect_Y");
+
+        gridLayout_4->addWidget(Reflect_Y, 2, 4, 1, 1);
+
+        label_21 = new QLabel(groupBox_6);
+        label_21->setObjectName("label_21");
+
+        gridLayout_4->addWidget(label_21, 0, 1, 1, 1);
+
+        Shear_Button = new QPushButton(groupBox_6);
+        Shear_Button->setObjectName("Shear_Button");
+
+        gridLayout_4->addWidget(Shear_Button, 2, 2, 1, 1);
+
+        Scale_Button = new QPushButton(groupBox_6);
+        Scale_Button->setObjectName("Scale_Button");
+
+        gridLayout_4->addWidget(Scale_Button, 3, 2, 1, 1);
+
+        label_20 = new QLabel(groupBox_6);
+        label_20->setObjectName("label_20");
+
+        gridLayout_4->addWidget(label_20, 0, 0, 1, 1);
+
+        Translate_Button = new QPushButton(groupBox_6);
+        Translate_Button->setObjectName("Translate_Button");
+
+        gridLayout_4->addWidget(Translate_Button, 1, 2, 1, 1);
+
+        label_23 = new QLabel(groupBox_6);
+        label_23->setObjectName("label_23");
+
+        gridLayout_4->addWidget(label_23, 1, 5, 1, 1);
+
+        Translate_X = new QSpinBox(groupBox_6);
+        Translate_X->setObjectName("Translate_X");
+        Translate_X->setMinimum(-99);
+
+        gridLayout_4->addWidget(Translate_X, 1, 0, 1, 1);
+
+        Reflect_X = new QPushButton(groupBox_6);
+        Reflect_X->setObjectName("Reflect_X");
+
+        gridLayout_4->addWidget(Reflect_X, 1, 4, 1, 1);
+
+        label_22 = new QLabel(groupBox_6);
+        label_22->setObjectName("label_22");
+
+        gridLayout_4->addWidget(label_22, 1, 3, 1, 1);
+
+        Rotate_Degrees = new QSpinBox(groupBox_6);
+        Rotate_Degrees->setObjectName("Rotate_Degrees");
+        Rotate_Degrees->setMinimum(-360);
+        Rotate_Degrees->setMaximum(360);
+
+        gridLayout_4->addWidget(Rotate_Degrees, 1, 6, 1, 1);
+
+        Scale_X = new QDoubleSpinBox(groupBox_6);
+        Scale_X->setObjectName("Scale_X");
+        Scale_X->setMinimum(-99.000000000000000);
+        Scale_X->setMaximum(99.000000000000000);
+
+        gridLayout_4->addWidget(Scale_X, 3, 0, 1, 1);
+
+        Scale_Y = new QDoubleSpinBox(groupBox_6);
+        Scale_Y->setObjectName("Scale_Y");
+        Scale_Y->setMinimum(-99.000000000000000);
+        Scale_Y->setMaximum(99.000000000000000);
+
+        gridLayout_4->addWidget(Scale_Y, 3, 1, 1, 1);
+
+        Rotate_AC_Button = new QPushButton(groupBox_6);
+        Rotate_AC_Button->setObjectName("Rotate_AC_Button");
+
+        gridLayout_4->addWidget(Rotate_AC_Button, 2, 6, 1, 1);
+
+        Shear_X = new QDoubleSpinBox(groupBox_6);
+        Shear_X->setObjectName("Shear_X");
+        Shear_X->setMinimum(-99.000000000000000);
+
+        gridLayout_4->addWidget(Shear_X, 2, 0, 1, 1);
+
+        Shear_Y = new QDoubleSpinBox(groupBox_6);
+        Shear_Y->setObjectName("Shear_Y");
+        Shear_Y->setMinimum(-99.000000000000000);
+
+        gridLayout_4->addWidget(Shear_Y, 2, 1, 1, 1);
+
+        groupBox_7 = new QGroupBox(centralwidget);
+        groupBox_7->setObjectName("groupBox_7");
+        groupBox_7->setGeometry(QRect(20, 640, 751, 111));
+        groupBox_7->setFont(font1);
+        gridLayout_5 = new QGridLayout(groupBox_7);
+        gridLayout_5->setObjectName("gridLayout_5");
+        Scale_Y_AP = new QDoubleSpinBox(groupBox_7);
+        Scale_Y_AP->setObjectName("Scale_Y_AP");
+        Scale_Y_AP->setMinimum(-99.000000000000000);
+        Scale_Y_AP->setMaximum(99.000000000000000);
+
+        gridLayout_5->addWidget(Scale_Y_AP, 1, 4, 1, 1);
+
+        Rotate_AC_Button_AP = new QPushButton(groupBox_7);
+        Rotate_AC_Button_AP->setObjectName("Rotate_AC_Button_AP");
+
+        gridLayout_5->addWidget(Rotate_AC_Button_AP, 2, 5, 1, 1);
+
+        Scale_X_AP = new QDoubleSpinBox(groupBox_7);
+        Scale_X_AP->setObjectName("Scale_X_AP");
+        Scale_X_AP->setMinimum(-99.000000000000000);
+        Scale_X_AP->setMaximum(99.000000000000000);
+
+        gridLayout_5->addWidget(Scale_X_AP, 1, 2, 1, 1);
+
+        Scale_Button_AP = new QPushButton(groupBox_7);
+        Scale_Button_AP->setObjectName("Scale_Button_AP");
+
+        gridLayout_5->addWidget(Scale_Button_AP, 1, 5, 1, 1);
+
+        label_24 = new QLabel(groupBox_7);
+        label_24->setObjectName("label_24");
+
+        gridLayout_5->addWidget(label_24, 1, 1, 1, 1);
+
+        label_25 = new QLabel(groupBox_7);
+        label_25->setObjectName("label_25");
+
+        gridLayout_5->addWidget(label_25, 1, 3, 1, 1);
+
+        Rotate_Degrees_AP = new QSpinBox(groupBox_7);
+        Rotate_Degrees_AP->setObjectName("Rotate_Degrees_AP");
+        Rotate_Degrees_AP->setMinimum(-360);
+        Rotate_Degrees_AP->setMaximum(360);
+
+        gridLayout_5->addWidget(Rotate_Degrees_AP, 2, 4, 1, 1);
+
+        label_26 = new QLabel(groupBox_7);
+        label_26->setObjectName("label_26");
+        QFont font2;
+        font2.setPointSize(9);
+        font2.setBold(true);
+        font2.setUnderline(true);
+        label_26->setFont(font2);
+
+        gridLayout_5->addWidget(label_26, 1, 0, 1, 1);
+
+        label_27 = new QLabel(groupBox_7);
+        label_27->setObjectName("label_27");
+        label_27->setFont(font2);
+
+        gridLayout_5->addWidget(label_27, 2, 3, 1, 1);
+
+        label_28 = new QLabel(groupBox_7);
+        label_28->setObjectName("label_28");
+        label_28->setFont(font2);
+
+        gridLayout_5->addWidget(label_28, 2, 0, 1, 1);
+
+        Reflect_AL = new QPushButton(groupBox_7);
+        Reflect_AL->setObjectName("Reflect_AL");
+
+        gridLayout_5->addWidget(Reflect_AL, 2, 1, 1, 1);
 
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
@@ -500,13 +708,33 @@ public:
         Polygon_Label->setText(QString());
         groupBox_5->setTitle(QCoreApplication::translate("MainWindow", "SEED FILLING", nullptr));
         Boundary_Fill->setText(QCoreApplication::translate("MainWindow", "Boundary Fill", nullptr));
-        label_13->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
-        label_15->setText(QCoreApplication::translate("MainWindow", "Blue", nullptr));
         label_12->setText(QCoreApplication::translate("MainWindow", "Red", nullptr));
         Flood_Fill->setText(QCoreApplication::translate("MainWindow", "Flood Fill", nullptr));
-        Flood_Fill_Time->setText(QString());
-        Boundary_Fill_Time->setText(QString());
         label_16->setText(QCoreApplication::translate("MainWindow", "Connected", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
+        Boundary_Fill_Time->setText(QString());
+        Flood_Fill_Time->setText(QString());
+        label_15->setText(QCoreApplication::translate("MainWindow", "Blue", nullptr));
+        groupBox_6->setTitle(QCoreApplication::translate("MainWindow", "TRANSFORMATION", nullptr));
+        Reflect_Y->setText(QCoreApplication::translate("MainWindow", "Reflect Along Y Axis", nullptr));
+        label_21->setText(QCoreApplication::translate("MainWindow", "Along Y Axis       ", nullptr));
+        Shear_Button->setText(QCoreApplication::translate("MainWindow", "Shear", nullptr));
+        Scale_Button->setText(QCoreApplication::translate("MainWindow", "Scale", nullptr));
+        label_20->setText(QCoreApplication::translate("MainWindow", "Along X Axis       ", nullptr));
+        Translate_Button->setText(QCoreApplication::translate("MainWindow", "Translate", nullptr));
+        label_23->setText(QString());
+        Reflect_X->setText(QCoreApplication::translate("MainWindow", "Reflect Along X Axis", nullptr));
+        label_22->setText(QString());
+        Rotate_AC_Button->setText(QCoreApplication::translate("MainWindow", "Rotate Anti-Clockwise", nullptr));
+        groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "ARBITRARY REFERENCE TRANSFORMATION", nullptr));
+        Rotate_AC_Button_AP->setText(QCoreApplication::translate("MainWindow", "Rotate Anti-Clockwise", nullptr));
+        Scale_Button_AP->setText(QCoreApplication::translate("MainWindow", "Scale", nullptr));
+        label_24->setText(QCoreApplication::translate("MainWindow", "Along X axis", nullptr));
+        label_25->setText(QCoreApplication::translate("MainWindow", "Along Y Axis", nullptr));
+        label_26->setText(QCoreApplication::translate("MainWindow", "Scaling wrt point", nullptr));
+        label_27->setText(QCoreApplication::translate("MainWindow", "Rotation wrt point", nullptr));
+        label_28->setText(QCoreApplication::translate("MainWindow", "Reflect wrt line", nullptr));
+        Reflect_AL->setText(QCoreApplication::translate("MainWindow", "Reflect", nullptr));
     } // retranslateUi
 
 };

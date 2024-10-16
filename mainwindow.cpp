@@ -272,7 +272,7 @@ void MainWindow::draw_Bresenham_Line(int x1, int y1, int x2, int y2, int r, int 
     for (const QPoint &pt : pts)
     {
         colorPointRelative(pt.x(), pt.y(), r, g, b);
-        Delay;
+       // Delay;
     }
 }
 
@@ -461,7 +461,7 @@ void MainWindow::on_Reset_Screen_Button_clicked()
     clearPixmap.fill(Qt::white);
     ui->workArea->setPixmap(clearPixmap);
 
-    clickedPoints.clear();
+    //clickedPoints.clear();
 
     ui->x_coordinate->clear();
     ui->y_coordinate->clear();
@@ -611,10 +611,13 @@ void MainWindow::on_Bresenham_Ellipse_Button_clicked()
     ui->Bresenham_Ellipse_Time->setText(QString::number(elapsed) + " ms");
 }
 QHash<QPoint, QVector<QPoint>> belongsToEdge;
+QVector<QPoint> polygonVertices;
+
 QHash<QPoint, QVector<QPoint>> MainWindow::make_polygon(int n)
 {
     allPolygonPoints.clear();
     belongsToEdge.clear();
+    polygonVertices.clear();  // Clear the previous vertices
     QSet<QPoint> distinctPoints;
     QList<QPoint> orderedPoints;
     QHash<QPoint, QVector<QPoint>> connections;  // Use QHash instead of QMap
@@ -635,6 +638,9 @@ QHash<QPoint, QVector<QPoint>> MainWindow::make_polygon(int n)
         return QHash<QPoint, QVector<QPoint>>();  // Return empty hash
     }
 
+    // Store the ordered points (vertices) in polygonVertices
+    polygonVertices = orderedPoints.toVector();
+
     // Iterate through the points to create the polygon lines and track connections
     for (int i = 0; i < orderedPoints.size(); ++i)
     {
@@ -642,14 +648,19 @@ QHash<QPoint, QVector<QPoint>> MainWindow::make_polygon(int n)
         QPoint p2 = orderedPoints[(i + 1) % orderedPoints.size()]; // Connect last point to the first one
         QSet<QPoint> linePoints = make_Bresenham_Line(p1.x(), p1.y(), p2.x(), p2.y());
         allPolygonPoints.unite(linePoints); // Add the line points to the overall polygon points
-        for(QPoint p:linePoints){
-            if(p!=p1 && p!=p2){
-                if(!belongsToEdge.contains(p))
-                    belongsToEdge[p]=QVector<QPoint>();
+
+        // Store non-vertex points and their associated edges in belongsToEdge
+        for(QPoint p: linePoints)
+        {
+            if (p != p1 && p != p2)
+            {
+                if (!belongsToEdge.contains(p))
+                    belongsToEdge[p] = QVector<QPoint>();
                 belongsToEdge[p].append(p1);
                 belongsToEdge[p].append(p2);
             }
         }
+
         // Add the connection p1 -> p2 and p2 -> p1 to the hash
         if (!connections.contains(p1)) {
             connections[p1] = QVector<QPoint>();
@@ -684,18 +695,11 @@ void MainWindow::on_Polygon_Button_clicked()
     }
 
     // Color the polygon points
-    int r = 255, g = 165, b = 0; // Color Orange
-    //int gridOffset = (ui->gridOffset->value() == 0) ? 1 : ui->gridOffset->value();
-
-    for (const QPoint &pt : allPolygonPoints)
-    {
-        colorPointRelative(pt.x(), pt.y(), r, g, b); // Simply color the points
-        Delay;
-    }
-
-    // Display the elapsed time in ms
+    int r = 255, g = 165, b = 0;
+    draw_polygon(r, g, b);
     qint64 elapsed = timer.elapsed();
     ui->Polygon_Label->setText(QString::number(elapsed) + " ms");
+    lekh polygonVertices;
 }
 
 void MainWindow::on_Polygon_Scanline_Fill_clicked()
@@ -816,7 +820,7 @@ void MainWindow::on_Polygon_Scanline_Fill_clicked()
     }
 
     qint64 elapsed = timer.elapsed();
-    ui->Flood_Fill_Time->setText(QString::number(elapsed) + " ms");
+    ui->Polygon_Label->setText(QString::number(elapsed) + " ms");
 }
 
 void MainWindow::on_Flood_Fill_clicked()
@@ -921,9 +925,6 @@ void MainWindow::on_Boundary_Fill_clicked()
     int height = ui->workArea->height();
     int centerX = width / 2;
     int centerY = height / 2;
-
-    QColor boundaryColor(255, 165, 0);
-    QSet<QPoint> visited;
     QQueue<QPoint> queue;
     queue.enqueue(seedPoint);
 
@@ -941,12 +942,11 @@ void MainWindow::on_Boundary_Fill_clicked()
         }
         QColor currentColor = getPixelColor(pixelX, pixelY);
 
-        if (currentColor == QColor(r, g, b) || currentColor == boundaryColor)
+        if (currentColor == QColor(r, g, b) || allPolygonPoints.contains({x, y}))
         {
             continue;
         }
         colorPointAbsolute(pixelX, pixelY, r, g, b, gridOffset);
-        visited.insert(QPoint(x, y));
         Delay;
 
         // Enqueue neighbors
@@ -967,4 +967,319 @@ void MainWindow::on_Boundary_Fill_clicked()
     ui->Boundary_Fill_Time->setText(QString::number(elapsed) + " ms");
 }
 
-// colors used:(255, 0, 0), (0, 255, 0), (0, 0, 255), (0, 0, 0), (255, 255, 255), (125, 0, 255), (0, 255, 255), (255, 0, 255), (85, 85, 85), (170, 170, 170) (265, 165, 0)
+void MainWindow::draw_polygon(int r, int g, int b)
+{
+    // Iterate over the vertices and draw a line between each consecutive pair of points
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        QPoint p1 = polygonVertices[i];
+        QPoint p2 = polygonVertices[(i + 1) % polygonVertices.size()]; // Connect the last point to the first one
+
+        // Draw the Bresenham line between p1 and p2
+        draw_Bresenham_Line(p1.x(), p1.y(), p2.x(), p2.y(), r, g, b);
+    }
+}
+
+void MainWindow::on_Translate_Button_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the translation values from the spin boxes
+    int translateX = ui->Translate_X->value();
+    int translateY = ui->Translate_Y->value();
+
+    // Step 4: Translate each point in the polygon
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        // Translate the point by adding translateX and translateY
+        polygonVertices[i].setX(polygonVertices[i].x() + translateX);
+        polygonVertices[i].setY(polygonVertices[i].y() + translateY);
+    }
+
+    // Step 5: Redraw the polygon with the translated vertices
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Shear_Button_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the shear values from the spin boxes
+    double shearX = ui->Shear_X->value();
+    double shearY = ui->Shear_Y->value();
+
+    // Step 4: Apply shear transformation to each vertex
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x();
+        double y = polygonVertices[i].y();
+
+        // Apply the shear transformation
+        int newX = static_cast<int>(x + shearX * y);  // Shearing in x-direction
+        int newY = static_cast<int>(y + shearY * x);  // Shearing in y-direction
+
+        // Update the vertex with the new coordinates
+        polygonVertices[i].setX(newX);
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 5: Redraw the polygon with the sheared vertices
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Scale_Button_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the scaling factors from the spin boxes
+    double scaleX = ui->Scale_X->value();
+    double scaleY = ui->Scale_Y->value();
+
+    // Step 4: Apply scaling transformation to each vertex
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x();
+        double y = polygonVertices[i].y();
+
+        // Apply the scaling transformation
+        int newX = static_cast<int>(x * scaleX);  // Scale in the x-direction
+        int newY = static_cast<int>(y * scaleY);  // Scale in the y-direction
+
+        // Update the vertex with the new coordinates
+        polygonVertices[i].setX(newX);
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 5: Redraw the polygon with the scaled vertices
+    draw_polygon(255, 165, 0);
+}
+
+
+void MainWindow::on_Reflect_X_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Apply reflection across the x-axis
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        int y = polygonVertices[i].y();
+
+        // Reflect across the x-axis (negate the y-coordinate)
+        int newY = -y;
+
+        // Update the vertex with the new coordinates
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 4: Redraw the polygon with the reflected vertices
+    draw_polygon(255, 165, 0);
+}
+
+
+void MainWindow::on_Reflect_Y_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Apply reflection across the x-axis
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        int x = polygonVertices[i].x();
+
+        // Reflect across the x-axis (negate the y-coordinate)
+        int newX = -x;
+
+        // Update the vertex with the new coordinates
+        polygonVertices[i].setX(newX);
+    }
+
+    // Step 4: Redraw the polygon with the reflected vertices
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Rotate_AC_Button_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the angle from the Rotate_Degrees QSpinBox
+    int angleDegrees = ui->Rotate_Degrees->value();
+
+    // Convert the angle to radians
+    double angleRadians = qDegreesToRadians(static_cast<double>(angleDegrees));
+
+    // Step 4: Apply rotation to each vertex
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x();
+        double y = polygonVertices[i].y();
+
+        // Calculate the new coordinates after rotation
+        int newX = static_cast<int>(x * cos(angleRadians) - y * sin(angleRadians));
+        int newY = static_cast<int>(x * sin(angleRadians) + y * cos(angleRadians));
+
+        // Update the vertex with the new coordinates
+        polygonVertices[i].setX(newX);
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 5: Redraw the polygon with the rotated vertices
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Scale_Button_AP_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the last clicked point (AP) for scaling
+    if (clickedPoints.size() < 1) return;  // Ensure we have at least one point clicked
+    QPoint AP = clickedPoints.back();  // The last point clicked
+
+    double scaleX = ui->Scale_X_AP->value();
+    double scaleY = ui->Scale_Y_AP->value();
+
+    // Step 4: Translate the polygon such that AP becomes the origin
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x() - AP.x();
+        double y = polygonVertices[i].y() - AP.y();
+
+        // Step 5: Scale with respect to AP
+        int newX = static_cast<int>(x * scaleX);
+        int newY = static_cast<int>(y * scaleY);
+
+        // Step 6: Translate back to original position
+        polygonVertices[i].setX(newX + AP.x());
+        polygonVertices[i].setY(newY + AP.y());
+    }
+
+    // Step 7: Redraw the polygon
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Reflect_AL_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the last two clicked points (AL) for reflection
+    if (clickedPoints.size() < 2) return;  // Ensure we have at least two points clicked
+    QPoint A1 = clickedPoints[clickedPoints.size() - 2];  // Second last point clicked
+    QPoint A2 = clickedPoints.back();  // Last point clicked
+
+    // Calculate the slope of the line A1 -> A2
+    double dx = A2.x() - A1.x();
+    double dy = A2.y() - A1.y();
+    double angle = atan2(dy, dx);  // Angle of the line with respect to the X-axis
+
+    // Step 4: Translate the polygon such that AL passes through the origin
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        polygonVertices[i] -= A1;  // Translate the points by A1
+    }
+
+    // Step 5: Rotate the polygon such that AL aligns with the X-axis
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x();
+        double y = polygonVertices[i].y();
+
+        int newX = static_cast<int>(x * cos(-angle) - y * sin(-angle));
+        int newY = static_cast<int>(x * sin(-angle) + y * cos(-angle));
+
+        polygonVertices[i].setX(newX);
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 6: Reflect the points over the X-axis (invert Y coordinates)
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        polygonVertices[i].setY(-polygonVertices[i].y());
+    }
+
+    // Step 7: Rotate the polygon back to its original position
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x();
+        double y = polygonVertices[i].y();
+
+        int newX = static_cast<int>(x * cos(angle) - y * sin(angle));
+        int newY = static_cast<int>(x * sin(angle) + y * cos(angle));
+
+        polygonVertices[i].setX(newX);
+        polygonVertices[i].setY(newY);
+    }
+
+    // Step 8: Translate the polygon back to its original position
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        polygonVertices[i] += A1;
+    }
+
+    // Step 9: Redraw the polygon
+    draw_polygon(255, 165, 0);
+}
+
+void MainWindow::on_Rotate_AC_Button_AP_clicked()
+{
+    // Step 1: Reset the screen
+    on_Reset_Screen_Button_clicked();
+
+    // Step 2: Show gridlines
+    on_gridlines_clicked();
+
+    // Step 3: Get the last clicked point (AP) for rotation
+    if (clickedPoints.size() < 1) return;  // Ensure we have at least one point clicked
+    QPoint AP = clickedPoints.back();  // The last point clicked
+
+    // Step 4: Get the rotation angle from Rotate_Degrees_AP QSpinBox
+    int angleDegrees = ui->Rotate_Degrees_AP->value();
+    double angleRadians = qDegreesToRadians(static_cast<double>(angleDegrees));
+
+    // Step 5: Translate the polygon such that AP becomes the origin
+    for (int i = 0; i < polygonVertices.size(); ++i)
+    {
+        double x = polygonVertices[i].x() - AP.x();
+        double y = polygonVertices[i].y() - AP.y();
+
+        // Step 6: Rotate the polygon
+        int newX = static_cast<int>(x * cos(angleRadians) - y * sin(angleRadians));
+        int newY = static_cast<int>(x * sin(angleRadians) + y * cos(angleRadians));
+
+        // Step 7: Translate back to original position
+        polygonVertices[i].setX(newX + AP.x());
+        polygonVertices[i].setY(newY + AP.y());
+    }
+
+    // Step 8: Redraw the polygon
+    draw_polygon(255, 165, 0);
+}

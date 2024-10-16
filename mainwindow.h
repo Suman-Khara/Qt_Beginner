@@ -48,6 +48,24 @@ private slots:
 
     void on_Boundary_Fill_clicked();
 
+    void on_Translate_Button_clicked();
+
+    void on_Shear_Button_clicked();
+
+    void on_Scale_Button_clicked();
+
+    void on_Reflect_X_clicked();
+
+    void on_Reflect_Y_clicked();
+
+    void on_Rotate_AC_Button_clicked();
+
+    void on_Scale_Button_AP_clicked();
+
+    void on_Reflect_AL_clicked();
+
+    void on_Rotate_AC_Button_AP_clicked();
+
 private:
     Ui::MainWindow *ui;
     void delay(int ms);
@@ -61,6 +79,7 @@ private:
     void drawCirclePoints(int x, int y, int pixelCenterX, int pixelCenterY, int r, int g, int b, int gridOffset);
     void drawEllipsePoints(int x, int y, int pixelCenterX, int pixelCenterY, int r, int g, int b, int gridOffset);
     QHash<QPoint, QVector<QPoint>> make_polygon(int n);
+    void draw_polygon(int r, int g, int b);
     QSet<QPoint> allPolygonPoints;
     QColor getPixelColor(int x, int y);
     QColor lastColor;
