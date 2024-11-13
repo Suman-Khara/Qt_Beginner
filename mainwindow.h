@@ -66,6 +66,10 @@ private slots:
 
     void on_Rotate_AC_Button_AP_clicked();
 
+    void on_Clip_Line_clicked();
+
+    void on_Clip_Polygon_clicked();
+
 private:
     Ui::MainWindow *ui;
     void delay(int ms);
@@ -88,5 +92,10 @@ private:
     int height;
     int centerX;
     int centerY;
+    QVector<QLine> lineStorage;
+    QHash<QPoint, QVector<QPoint>> belongsToEdge;
+    QVector<QPoint> polygonVertices;
+    bool inside(const QPoint &p, int edge, int xmin, int ymin, int xmax, int ymax);
+    QPoint intersect(const QPoint &p1, const QPoint &p2, int edge, int xmin, int ymin, int xmax, int ymax);
 };
 #endif // MAINWINDOW_H

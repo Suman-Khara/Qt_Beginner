@@ -9,6 +9,8 @@
 #include <QQueue>
 #define lekh qDebug() <<
 #define Delay delay(1)
+bool axis_shown=false;
+bool grids_shown=false;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), ui(new Ui::MainWindow)
 {
@@ -59,6 +61,7 @@ void MainWindow::colorPointRelative(int x, int y, int r, int g, int b)
 
 void MainWindow::on_showAxis_clicked()
 {
+    axis_shown=true;
     int gridOffset = (ui->gridOffset->value() == 0) ? 1 : ui->gridOffset->value();
     int width = ui->workArea->width();
     int height = ui->workArea->height();
@@ -76,6 +79,7 @@ void MainWindow::on_showAxis_clicked()
 
 void MainWindow::on_gridlines_clicked()
 {
+    grids_shown=true;
     int gridOffset = ui->gridOffset->value();
     int width = ui->workArea->width();
     int height = ui->workArea->height();
@@ -262,17 +266,16 @@ QSet<QPoint> MainWindow::make_Bresenham_Line(int x1, int y1, int x2, int y2)
 
 void MainWindow::draw_Bresenham_Line(int x1, int y1, int x2, int y2, int r, int g, int b)
 {
+    // Store the line
+    lineStorage.append(QLine(x1, y1, x2, y2));
+
     // Call make_Bresenham_Line to get the set of points that make the line
     QSet<QPoint> pts = make_Bresenham_Line(x1, y1, x2, y2);
-
-    // Get the grid offset for coloring
-    //int gridOffset = (ui->gridOffset->value() == 0) ? 1 : ui->gridOffset->value();
 
     // Iterate over the points and color them
     for (const QPoint &pt : pts)
     {
         colorPointRelative(pt.x(), pt.y(), r, g, b);
-       // Delay;
     }
 }
 
@@ -285,7 +288,7 @@ void MainWindow::on_Bresenham_Button_clicked()
     auto coords2 = clickedPoints[n - 2];
     QElapsedTimer timer;
     timer.start();
-    draw_Bresenham_Line(coords1.x(), coords1.y(), coords2.x(), coords2.y(), 125, 0, 255);
+    draw_Bresenham_Line(coords1.x(), coords1.y(), coords2.x(), coords2.y(), 200, 0, 255);
     qint64 elapsedTime = timer.nsecsElapsed();
     ui->Bresenham_Time->setText(QString("Time Taken: ") + QString::number(elapsedTime) + QString(" ns"));
 }
@@ -610,8 +613,6 @@ void MainWindow::on_Bresenham_Ellipse_Button_clicked()
     qint64 elapsed = timer.elapsed();
     ui->Bresenham_Ellipse_Time->setText(QString::number(elapsed) + " ms");
 }
-QHash<QPoint, QVector<QPoint>> belongsToEdge;
-QVector<QPoint> polygonVertices;
 
 QHash<QPoint, QVector<QPoint>> MainWindow::make_polygon(int n)
 {
@@ -695,7 +696,7 @@ void MainWindow::on_Polygon_Button_clicked()
     }
 
     // Color the polygon points
-    int r = 255, g = 165, b = 0;
+    int r = 255, g = 255, b = 0;
     draw_polygon(r, g, b);
     qint64 elapsed = timer.elapsed();
     ui->Polygon_Label->setText(QString::number(elapsed) + " ms");
@@ -1282,4 +1283,187 @@ void MainWindow::on_Rotate_AC_Button_AP_clicked()
 
     // Step 8: Redraw the polygon
     draw_polygon(255, 165, 0);
+}
+
+const int INSIDE = 0; // 0000
+const int LEFT = 1;   // 0001
+const int RIGHT = 2;  // 0010
+const int BOTTOM = 4; // 0100
+const int TOP = 8;    // 1000
+
+int computeCode(int x, int y, int xMin, int yMin, int xMax, int yMax) {
+    int code = INSIDE;
+    if (x < xMin) code |= LEFT;
+    else if (x > xMax) code |= RIGHT;
+    if (y < yMin) code |= BOTTOM;
+    else if (y > yMax) code |= TOP;
+    return code;
+}
+bool cohenSutherlandClip(int &x1, int &y1, int &x2, int &y2, int xMin, int yMin, int xMax, int yMax) {
+    int code1 = computeCode(x1, y1, xMin, yMin, xMax, yMax);
+    int code2 = computeCode(x2, y2, xMin, yMin, xMax, yMax);
+    bool accept = false;
+
+    while (true) {
+        if (!(code1 | code2)) {
+            accept = true; // Both points are inside
+            break;
+        } else if (code1 & code2) {
+            break; // Both points share an outside region, trivially reject
+        } else {
+            int x, y;
+            int codeOut = code1 ? code1 : code2;
+
+            if (codeOut & TOP) {
+                x = x1 + (x2 - x1) * (yMax - y1) / (y2 - y1);
+                y = yMax;
+            } else if (codeOut & BOTTOM) {
+                x = x1 + (x2 - x1) * (yMin - y1) / (y2 - y1);
+                y = yMin;
+            } else if (codeOut & RIGHT) {
+                y = y1 + (y2 - y1) * (xMax - x1) / (x2 - x1);
+                x = xMax;
+            } else if (codeOut & LEFT) {
+                y = y1 + (y2 - y1) * (xMin - x1) / (x2 - x1);
+                x = xMin;
+            }
+
+            if (codeOut == code1) {
+                x1 = x;
+                y1 = y;
+                code1 = computeCode(x1, y1, xMin, yMin, xMax, yMax);
+            } else {
+                x2 = x;
+                y2 = y;
+                code2 = computeCode(x2, y2, xMin, yMin, xMax, yMax);
+            }
+        }
+    }
+    return accept;
+}
+void MainWindow::on_Clip_Line_clicked() {
+    // Ensure there are at least two points to define the rectangular window
+    if (clickedPoints.size() < 2) {
+        return;
+    }
+
+    /*on_Reset_Screen_Button_clicked();
+    if(axis_shown)
+        on_showAxis_clicked();
+    if(grids_shown)
+        on_gridlines_clicked();*/
+    // Define the clipping rectangle
+    QPoint p1 = clickedPoints[clickedPoints.size() - 2];
+    QPoint p2 = clickedPoints[clickedPoints.size() - 1];
+    int xMin = std::min(p1.x(), p2.x());
+    int yMin = std::min(p1.y(), p2.y());
+    int xMax = std::max(p1.x(), p2.x());
+    int yMax = std::max(p1.y(), p2.y());
+
+    // Draw the clipping window in blue-green color
+    draw_DDA_Line(xMin, yMin, xMin, yMax, 0, 128, 128); // Left
+    draw_DDA_Line(xMin, yMax, xMax, yMax, 0, 128, 128); // Top
+    draw_DDA_Line(xMax, yMax, xMax, yMin, 0, 128, 128); // Right
+    draw_DDA_Line(xMax, yMin, xMin, yMin, 0, 128, 128); // Bottom
+
+    // Clip each line in lineStorage using Cohen-Sutherland
+    for (auto line : lineStorage) {
+        int x1 = line.x1();
+        int y1 = line.y1();
+        int x2 = line.x2();
+        int y2 = line.y2();
+        // Clip the line and, if accepted, draw it
+        if (cohenSutherlandClip(x1, y1, x2, y2, xMin, yMin, xMax, yMax)) {
+            draw_Bresenham_Line(x1, y1, x2, y2, 50, 0, 100);
+            //lekh "X1:"<<x1<<" Y1:"<<y1<<" X2:"<<x2<<" Y2:"<<y2;
+        }
+    }
+}
+
+void MainWindow::on_Clip_Polygon_clicked() {
+    // Ensure we have at least two points to define the clipping window
+    if (clickedPoints.size() < 2) return;
+    QPoint p1 = clickedPoints[clickedPoints.size() - 2];
+    QPoint p2 = clickedPoints[clickedPoints.size() - 1];
+    // Define the clipping window's bounds
+    int xmin = std::min(p1.x(), p2.x());
+    int ymin = std::min(p1.y(), p2.y());
+    int xmax = std::max(p1.x(), p2.x());
+    int ymax = std::max(p1.y(), p2.y());
+
+    QVector<QPoint> final_vertices = polygonVertices;  // Temporary storage for clipped polygon vertices
+
+    // Clip against each boundary (left, right, bottom, top) using Sutherland-Hodgman
+    for (int edge = 0; edge < 4; ++edge) {
+        QVector<QPoint> clippedPolygon;
+        int n = final_vertices.size();
+
+        for (int i = 0; i < n; ++i) {
+            QPoint current = final_vertices[i];
+            QPoint prev = final_vertices[(i + n - 1) % n];
+
+            bool currInside = inside(current, edge, xmin, ymin, xmax, ymax);
+            bool prevInside = inside(prev, edge, xmin, ymin, xmax, ymax);
+
+            if (currInside) {
+                if (!prevInside) {  // Entering the clipping boundary
+                    clippedPolygon.append(intersect(prev, current, edge, xmin, ymin, xmax, ymax));
+                }
+                clippedPolygon.append(current);  // Always add the current point if it's inside
+            } else if (prevInside) {  // Exiting the clipping boundary
+                clippedPolygon.append(intersect(prev, current, edge, xmin, ymin, xmax, ymax));
+            }
+        }
+        final_vertices = clippedPolygon;  // Update vertices for the next edge
+    }
+
+    // Clear screen, redraw window, and draw clipped polygon
+    //on_Reset_Screen_Button_clicked();
+    draw_DDA_Line(xmin, ymin, xmax, ymin, 200, 200, 200); // Bottom edge
+    draw_DDA_Line(xmax, ymin, xmax, ymax, 200, 200, 200); // Right edge
+    draw_DDA_Line(xmax, ymax, xmin, ymax, 200, 200, 200); // Top edge
+    draw_DDA_Line(xmin, ymax, xmin, ymin, 200, 200, 200); // Left edge
+
+    // Draw the clipped polygon in the specified color
+    for (int i = 0; i < final_vertices.size(); ++i) {
+        int x1 = final_vertices[i].x();
+        int y1 = final_vertices[i].y();
+        int x2 = final_vertices[(i + 1) % final_vertices.size()].x();
+        int y2 = final_vertices[(i + 1) % final_vertices.size()].y();
+        draw_Bresenham_Line(x1, y1, x2, y2, 50, 50, 0);
+    }
+}
+
+// Utility function to check if a point is inside a boundary edge
+bool MainWindow::inside(const QPoint &p, int edge, int xmin, int ymin, int xmax, int ymax) {
+    switch (edge) {
+    case 0: return p.x() >= xmin;  // Left boundary
+    case 1: return p.x() <= xmax;  // Right boundary
+    case 2: return p.y() >= ymin;  // Bottom boundary
+    case 3: return p.y() <= ymax;  // Top boundary
+    }
+    return false;
+}
+
+// Utility function to find intersection point for an edge
+QPoint MainWindow::intersect(const QPoint &p1, const QPoint &p2, int edge, int xmin, int ymin, int xmax, int ymax) {
+    double x, y;
+    int dx = p2.x() - p1.x();
+    int dy = p2.y() - p1.y();
+
+    switch (edge) {
+    case 0:  // Left
+        y = p1.y() + dy * (xmin - p1.x()) / double(dx);
+        return QPoint(xmin, int(y));
+    case 1:  // Right
+        y = p1.y() + dy * (xmax - p1.x()) / double(dx);
+        return QPoint(xmax, int(y));
+    case 2:  // Bottom
+        x = p1.x() + dx * (ymin - p1.y()) / double(dy);
+        return QPoint(int(x), ymin);
+    case 3:  // Top
+        x = p1.x() + dx * (ymax - p1.y()) / double(dy);
+        return QPoint(int(x), ymax);
+    }
+    return QPoint();
 }

@@ -63,11 +63,11 @@ public:
     QPushButton *Bresenham_Ellipse_Button;
     QLabel *Bresenham_Ellipse_Time;
     QGroupBox *groupBox_3;
-    QHBoxLayout *horizontalLayout;
-    QPushButton *DDA_Button;
-    QLabel *DDA_Time;
+    QVBoxLayout *verticalLayout_3;
     QPushButton *Bresenham_Button;
     QLabel *Bresenham_Time;
+    QPushButton *DDA_Button;
+    QLabel *DDA_Time;
     QGroupBox *groupBox_4;
     QGridLayout *gridLayout;
     QLabel *label_9;
@@ -127,6 +127,10 @@ public:
     QLabel *label_27;
     QLabel *label_28;
     QPushButton *Reflect_AL;
+    QGroupBox *groupBox_8;
+    QHBoxLayout *horizontalLayout;
+    QPushButton *Clip_Line;
+    QPushButton *Clip_Polygon;
     QMenuBar *menubar;
     QStatusBar *statusbar;
 
@@ -184,17 +188,18 @@ public:
         label_3->setObjectName("label_3");
         label_3->setGeometry(QRect(770, 110, 81, 20));
         label_3->setFont(font);
+        label_3->setFrameShape(QFrame::Shape::NoFrame);
         label_4 = new QLabel(centralwidget);
         label_4->setObjectName("label_4");
         label_4->setGeometry(QRect(770, 160, 81, 20));
         label_4->setFont(font);
         Reset_Screen_Button = new QPushButton(centralwidget);
         Reset_Screen_Button->setObjectName("Reset_Screen_Button");
-        Reset_Screen_Button->setGeometry(QRect(1010, 130, 141, 29));
+        Reset_Screen_Button->setGeometry(QRect(980, 70, 141, 29));
         Reset_Screen_Button->setFont(font);
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
-        groupBox->setGeometry(QRect(770, 280, 151, 291));
+        groupBox->setGeometry(QRect(900, 190, 151, 291));
         QFont font1;
         font1.setPointSize(9);
         font1.setBold(true);
@@ -247,7 +252,7 @@ public:
 
         groupBox_2 = new QGroupBox(centralwidget);
         groupBox_2->setObjectName("groupBox_2");
-        groupBox_2->setGeometry(QRect(920, 280, 161, 291));
+        groupBox_2->setGeometry(QRect(1050, 190, 161, 291));
         groupBox_2->setFont(font1);
         verticalLayout_2 = new QVBoxLayout(groupBox_2);
         verticalLayout_2->setObjectName("verticalLayout_2");
@@ -303,37 +308,37 @@ public:
 
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName("groupBox_3");
-        groupBox_3->setGeometry(QRect(770, 190, 621, 81));
+        groupBox_3->setGeometry(QRect(760, 190, 141, 291));
         groupBox_3->setFont(font);
-        horizontalLayout = new QHBoxLayout(groupBox_3);
-        horizontalLayout->setObjectName("horizontalLayout");
-        DDA_Button = new QPushButton(groupBox_3);
-        DDA_Button->setObjectName("DDA_Button");
-        DDA_Button->setFont(font);
-
-        horizontalLayout->addWidget(DDA_Button);
-
-        DDA_Time = new QLabel(groupBox_3);
-        DDA_Time->setObjectName("DDA_Time");
-        DDA_Time->setFont(font);
-
-        horizontalLayout->addWidget(DDA_Time);
-
+        verticalLayout_3 = new QVBoxLayout(groupBox_3);
+        verticalLayout_3->setObjectName("verticalLayout_3");
         Bresenham_Button = new QPushButton(groupBox_3);
         Bresenham_Button->setObjectName("Bresenham_Button");
         Bresenham_Button->setFont(font);
 
-        horizontalLayout->addWidget(Bresenham_Button);
+        verticalLayout_3->addWidget(Bresenham_Button);
 
         Bresenham_Time = new QLabel(groupBox_3);
         Bresenham_Time->setObjectName("Bresenham_Time");
         Bresenham_Time->setFont(font);
 
-        horizontalLayout->addWidget(Bresenham_Time);
+        verticalLayout_3->addWidget(Bresenham_Time);
+
+        DDA_Button = new QPushButton(groupBox_3);
+        DDA_Button->setObjectName("DDA_Button");
+        DDA_Button->setFont(font);
+
+        verticalLayout_3->addWidget(DDA_Button);
+
+        DDA_Time = new QLabel(groupBox_3);
+        DDA_Time->setObjectName("DDA_Time");
+        DDA_Time->setFont(font);
+
+        verticalLayout_3->addWidget(DDA_Time);
 
         groupBox_4 = new QGroupBox(centralwidget);
         groupBox_4->setObjectName("groupBox_4");
-        groupBox_4->setGeometry(QRect(1080, 280, 151, 291));
+        groupBox_4->setGeometry(QRect(1210, 190, 151, 291));
         groupBox_4->setFont(font);
         gridLayout = new QGridLayout(groupBox_4);
         gridLayout->setObjectName("gridLayout");
@@ -402,7 +407,7 @@ public:
 
         groupBox_5 = new QGroupBox(centralwidget);
         groupBox_5->setObjectName("groupBox_5");
-        groupBox_5->setGeometry(QRect(1230, 280, 161, 291));
+        groupBox_5->setGeometry(QRect(1360, 190, 161, 291));
         groupBox_5->setFont(font);
         gridLayout_2 = new QGridLayout(groupBox_5);
         gridLayout_2->setObjectName("gridLayout_2");
@@ -478,7 +483,7 @@ public:
 
         groupBox_6 = new QGroupBox(centralwidget);
         groupBox_6->setObjectName("groupBox_6");
-        groupBox_6->setGeometry(QRect(770, 570, 701, 181));
+        groupBox_6->setGeometry(QRect(760, 480, 751, 181));
         groupBox_6->setFont(font);
         gridLayout_4 = new QGridLayout(groupBox_6);
         gridLayout_4->setObjectName("gridLayout_4");
@@ -579,7 +584,7 @@ public:
 
         groupBox_7 = new QGroupBox(centralwidget);
         groupBox_7->setObjectName("groupBox_7");
-        groupBox_7->setGeometry(QRect(20, 640, 751, 111));
+        groupBox_7->setGeometry(QRect(760, 660, 751, 111));
         groupBox_7->setFont(font1);
         gridLayout_5 = new QGridLayout(groupBox_7);
         gridLayout_5->setObjectName("gridLayout_5");
@@ -651,6 +656,24 @@ public:
 
         gridLayout_5->addWidget(Reflect_AL, 2, 1, 1, 1);
 
+        groupBox_8 = new QGroupBox(centralwidget);
+        groupBox_8->setObjectName("groupBox_8");
+        groupBox_8->setGeometry(QRect(220, 680, 268, 80));
+        groupBox_8->setFont(font);
+        horizontalLayout = new QHBoxLayout(groupBox_8);
+        horizontalLayout->setObjectName("horizontalLayout");
+        Clip_Line = new QPushButton(groupBox_8);
+        Clip_Line->setObjectName("Clip_Line");
+        Clip_Line->setFont(font);
+
+        horizontalLayout->addWidget(Clip_Line);
+
+        Clip_Polygon = new QPushButton(groupBox_8);
+        Clip_Polygon->setObjectName("Clip_Polygon");
+        Clip_Polygon->setFont(font);
+
+        horizontalLayout->addWidget(Clip_Polygon);
+
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
@@ -694,10 +717,10 @@ public:
         Bresenham_Ellipse_Button->setText(QCoreApplication::translate("MainWindow", "Bresenham Ellipse", nullptr));
         Bresenham_Ellipse_Time->setText(QString());
         groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "STRAIGHT LINE", nullptr));
-        DDA_Button->setText(QCoreApplication::translate("MainWindow", "DDA Line", nullptr));
-        DDA_Time->setText(QString());
         Bresenham_Button->setText(QCoreApplication::translate("MainWindow", "Bresenham Line", nullptr));
         Bresenham_Time->setText(QString());
+        DDA_Button->setText(QCoreApplication::translate("MainWindow", "DDA Line", nullptr));
+        DDA_Time->setText(QString());
         groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "POLYGON", nullptr));
         label_9->setText(QCoreApplication::translate("MainWindow", "Red", nullptr));
         label_10->setText(QCoreApplication::translate("MainWindow", "Green", nullptr));
@@ -735,6 +758,9 @@ public:
         label_27->setText(QCoreApplication::translate("MainWindow", "Rotation wrt point", nullptr));
         label_28->setText(QCoreApplication::translate("MainWindow", "Reflect wrt line", nullptr));
         Reflect_AL->setText(QCoreApplication::translate("MainWindow", "Reflect", nullptr));
+        groupBox_8->setTitle(QCoreApplication::translate("MainWindow", "CLIPPING", nullptr));
+        Clip_Line->setText(QCoreApplication::translate("MainWindow", "Clip Line", nullptr));
+        Clip_Polygon->setText(QCoreApplication::translate("MainWindow", "Clip Polygon", nullptr));
     } // retranslateUi
 
 };

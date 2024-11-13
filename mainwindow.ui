@@ -197,6 +197,9 @@
       <bold>true</bold>
      </font>
     </property>
+    <property name="frameShape">
+     <enum>QFrame::Shape::NoFrame</enum>
+    </property>
     <property name="text">
      <string>GridOffset</string>
     </property>
@@ -222,8 +225,8 @@
    <widget class="QPushButton" name="Reset_Screen_Button">
     <property name="geometry">
      <rect>
-      <x>1010</x>
-      <y>130</y>
+      <x>980</x>
+      <y>70</y>
       <width>141</width>
       <height>29</height>
      </rect>
@@ -240,8 +243,8 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>280</y>
+      <x>900</x>
+      <y>190</y>
       <width>151</width>
       <height>291</height>
      </rect>
@@ -328,8 +331,8 @@
    <widget class="QGroupBox" name="groupBox_2">
     <property name="geometry">
      <rect>
-      <x>920</x>
-      <y>280</y>
+      <x>1050</x>
+      <y>190</y>
       <width>161</width>
       <height>291</height>
      </rect>
@@ -453,10 +456,10 @@
    <widget class="QGroupBox" name="groupBox_3">
     <property name="geometry">
      <rect>
-      <x>770</x>
+      <x>760</x>
       <y>190</y>
-      <width>621</width>
-      <height>81</height>
+      <width>141</width>
+      <height>291</height>
      </rect>
     </property>
     <property name="font">
@@ -467,31 +470,7 @@
     <property name="title">
      <string>STRAIGHT LINE</string>
     </property>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="DDA_Button">
-       <property name="font">
-        <font>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>DDA Line</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLabel" name="DDA_Time">
-       <property name="font">
-        <font>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
+    <layout class="QVBoxLayout" name="verticalLayout_3">
      <item>
       <widget class="QPushButton" name="Bresenham_Button">
        <property name="font">
@@ -516,13 +495,37 @@
        </property>
       </widget>
      </item>
+     <item>
+      <widget class="QPushButton" name="DDA_Button">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>DDA Line</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLabel" name="DDA_Time">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
     </layout>
    </widget>
    <widget class="QGroupBox" name="groupBox_4">
     <property name="geometry">
      <rect>
-      <x>1080</x>
-      <y>280</y>
+      <x>1210</x>
+      <y>190</y>
       <width>151</width>
       <height>291</height>
      </rect>
@@ -644,8 +647,8 @@
    <widget class="QGroupBox" name="groupBox_5">
     <property name="geometry">
      <rect>
-      <x>1230</x>
-      <y>280</y>
+      <x>1360</x>
+      <y>190</y>
       <width>161</width>
       <height>291</height>
      </rect>
@@ -782,9 +785,9 @@
    <widget class="QGroupBox" name="groupBox_6">
     <property name="geometry">
      <rect>
-      <x>770</x>
-      <y>570</y>
-      <width>701</width>
+      <x>760</x>
+      <y>480</y>
+      <width>751</width>
       <height>181</height>
      </rect>
     </property>
@@ -930,8 +933,8 @@
    <widget class="QGroupBox" name="groupBox_7">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>640</y>
+      <x>760</x>
+      <y>660</y>
       <width>751</width>
       <height>111</height>
      </rect>
@@ -1050,6 +1053,50 @@
       <widget class="QPushButton" name="Reflect_AL">
        <property name="text">
         <string>Reflect</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+   <widget class="QGroupBox" name="groupBox_8">
+    <property name="geometry">
+     <rect>
+      <x>220</x>
+      <y>680</y>
+      <width>268</width>
+      <height>80</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="title">
+     <string>CLIPPING</string>
+    </property>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="Clip_Line">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Clip Line</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="Clip_Polygon">
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>Clip Polygon</string>
        </property>
       </widget>
      </item>
