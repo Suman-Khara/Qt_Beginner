@@ -152,7 +152,7 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event)
             int gridY = floor((centerY - y) * 1.0 / gridOffset);
 
             clickedPoints.push_back({gridX, gridY});
-            lekh gridX<<gridY;
+            //lekh gridX<<gridY;
             int calcX = centerX + gridX * gridOffset + gridOffset / 2;
             int calcY = centerY - gridY * gridOffset - gridOffset / 2;
             lastColor=getPixelColor(calcX, calcY);
@@ -696,11 +696,11 @@ void MainWindow::on_Polygon_Button_clicked()
     }
 
     // Color the polygon points
-    int r = 255, g = 255, b = 0;
+    int r = 255, g = 165, b = 0;
     draw_polygon(r, g, b);
     qint64 elapsed = timer.elapsed();
     ui->Polygon_Label->setText(QString::number(elapsed) + " ms");
-    lekh polygonVertices;
+    //lekh polygonVertices;
 }
 
 void MainWindow::on_Polygon_Scanline_Fill_clicked()
@@ -876,8 +876,8 @@ void MainWindow::on_Flood_Fill_clicked()
             Delay;
 
             stack.push(QPoint(x + 1, y));
-            stack.push(QPoint(x - 1, y));
             stack.push(QPoint(x, y + 1));
+            stack.push(QPoint(x - 1, y));
             stack.push(QPoint(x, y - 1));
             if (c == 8)
             {

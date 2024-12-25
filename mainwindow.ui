@@ -600,6 +600,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="maximum">
+        <number>255</number>
+       </property>
       </widget>
      </item>
      <item row="5" column="1">
@@ -609,6 +612,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="maximum">
+        <number>255</number>
+       </property>
       </widget>
      </item>
      <item row="6" column="1">
@@ -617,6 +623,9 @@
         <font>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="maximum">
+        <number>255</number>
        </property>
       </widget>
      </item>
@@ -681,6 +690,15 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="minimum">
+        <number>4</number>
+       </property>
+       <property name="maximum">
+        <number>8</number>
+       </property>
+       <property name="singleStep">
+        <number>4</number>
+       </property>
       </widget>
      </item>
      <item row="2" column="1">
@@ -689,6 +707,9 @@
         <font>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="maximum">
+        <number>255</number>
        </property>
       </widget>
      </item>
@@ -725,6 +746,9 @@
          <bold>true</bold>
         </font>
        </property>
+       <property name="maximum">
+        <number>255</number>
+       </property>
       </widget>
      </item>
      <item row="2" column="0">
@@ -755,6 +779,9 @@
         <font>
          <bold>true</bold>
         </font>
+       </property>
+       <property name="maximum">
+        <number>255</number>
        </property>
       </widget>
      </item>
